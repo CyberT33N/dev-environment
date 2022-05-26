@@ -1,0 +1,15 @@
+networks:
+  default:
+    external:
+      name: localdev
+
+services:
+  gitlab:
+    extends:
+      file: services/gitlab/service.yml
+      service: web
+
+  mongo:
+    extends:
+      file: services/mongo/service.yml
+      service: mongo
