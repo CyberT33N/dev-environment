@@ -4,12 +4,19 @@ networks:
       name: localdev
 
 services:
+  mongo:
+    extends:
+      file: services/mongo/service.yml
+      service: mongo
+
   gitlab:
     extends:
       file: services/gitlab/service.yml
       service: web
 
-  mongo:
+  gitlab-runner:
+    depends_on:
+      - gitlab
     extends:
-      file: services/mongo/service.yml
-      service: mongo
+      file: services/gitlab-runner/service.yml
+      service: gitlab-runner

@@ -1,2 +1,3 @@
 sudo docker-compose down
-sudo -E docker-compose up
+sudo docker-compose up -d
+sudo docker-compose exec gitlab-runner gitlab-runner register
