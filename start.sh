@@ -6,7 +6,7 @@ echo 'docker-compose up init..'
 sudo docker-compose up -d
 echo '\n\n'
 
-# echo 'register gitlab-runner..'
+#echo 'register gitlab-runner..'
 #sudo docker-compose exec gitlab-runner gitlab-runner register \
 #--non-interactive \
 #--url http://gitlab.local.com/ \
