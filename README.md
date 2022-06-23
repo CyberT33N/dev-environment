@@ -1,3 +1,21 @@
+# Maybe usefully
+
+<br><br>
+
+## Gitlab
+
+<br><br>
+
+### Reset Password
+```
+sudo docker exec -it gitlab-ce bash
+gitlab-rake "gitlab:password:reset[root]"
+```
+
+<br><br>
+<br><br>
+
+
 # Known problems
 
 <br><br>
