@@ -1,7 +1,11 @@
-version: '3.6'
+version: '3.9'
 
 services:
   gitlab-runner:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
     image: gitlab/gitlab-runner:alpine
     restart: unless-stopped
     volumes:

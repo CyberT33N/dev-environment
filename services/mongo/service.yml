@@ -1,7 +1,11 @@
-version: '3.6'
+version: '3.9'
 
 services:
   mongo:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
     image: mongo
     container_name: mongo
     ports:
