@@ -27,3 +27,7 @@ gitlab-rake "gitlab:password:reset[root]"
 ```
 sudo rm -rf /srv/mongo/diagnostic.data
 ```
+
+
+## gitlab.local.com is offline
+- Try to run again start.sh
