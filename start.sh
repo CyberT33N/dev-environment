@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo 'docker-compose down init..'
 sudo docker-compose down
 echo '\n\n'
