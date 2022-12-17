@@ -2,6 +2,10 @@ version: '3.9'
 
 services:
   web:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
     image: 'gitlab/gitlab-ee:latest'
     restart: always
     hostname: 'gitlab.local.com'
