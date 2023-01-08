@@ -5,7 +5,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.1'
+          cpus: '0.75'
     image: 'gitlab/gitlab-ee:latest'
     restart: always
     hostname: 'gitlab.local.com'
