@@ -9,10 +9,10 @@ services:
       file: services/mongo/service.yml
       service: mongo
 
-  mongo-test:
-    extends:
-      file: services/mongo-test/service.yml
-      service: mongo-test
+  # mongo-test:
+  #   extends:
+  #     file: services/mongo-test/service.yml
+  #     service: mongo-test
 
   gitlab:
     extends:
