@@ -6,6 +6,7 @@ services:
       resources:
         limits:
           cpus: '0.1'
+          memory: 2000M
     image: mongo
     container_name: mongo
     ports:
