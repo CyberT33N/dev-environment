@@ -2,18 +2,18 @@ version: '3.9'
 
 services:
   mongo:
+    container_name: mongo
     deploy:
       resources:
         limits:
           cpus: '0.1'
-          memory: 2000M
-    image: mongo
-    container_name: mongo
+          memory: 512M
+    image: mongo:7
     ports:
       - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: $MONGO_USERNAME
       MONGO_INITDB_ROOT_PASSWORD: $MONGO_PASSWORD
-    command: mongod --nojournal
+    command: mongod
     volumes:
       - '$MONGO_HOME:/data/db:z'

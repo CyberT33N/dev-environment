@@ -2,10 +2,12 @@ version: '3.9'
 
 services:
   gitlab-runner:
+    container_name: gitlab-runner
     deploy:
       resources:
         limits:
           cpus: '0.1'
+          memory: 512M
     image: gitlab/gitlab-runner:alpine
     restart: unless-stopped
     volumes:

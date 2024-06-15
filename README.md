@@ -1,4 +1,114 @@
-# Maybe usefully
+# Start
+- If you run this for the first time run `docker network create localdev`. Then `bash start.sh`
+
+```shell
+# sudo bash .start.sh # Startet alle Services
+# sudo bash ./start.sh --service=mongo     # Startet nur den `mongo` Service
+# sudo bash ./start.sh --service=mongo,gitlab   # Startet `mongo` und `gitlab` Services
+# sudo bash ./start.sh --service=gitlab-runner    # Startet nur den `gitlab-runner` Service
+```
+
+
+<br><br>
+
+## Register Gitlab Runner
+- Maybe not needed
+```
+## ------------------------------------------------------- ##
+
+#echo 'register gitlab-runner..'
+#sudo docker-compose exec gitlab-runner gitlab-runner register \
+#--non-interactive \
+#--url http://gitlab.local.com/ \
+#--tag-list "test" \
+#--registration-token xxxxxxxxxxxxx \
+#--executor docker \
+#--docker-image node:18.2.0 \
+#--docker-network-mode localdev
+
+# Alternative you can use the interactive mode:
+# sudo docker-compose exec gitlab-runner gitlab-runner register
+
+## ------------------------------------------------------- ##
+```
+
+
+
+
+<br><br>
+<br><br>
+______________________________________________
+______________________________________________
+
+<br><br>
+<br><br>
+
+# URL's
+
+<br><br>
+
+## MongoDB
+- mongodb://test:test@localhost:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false
+
+<br><br>
+
+## Gitlab
+- http://gitlab.local.com
+- http://10.0.1.2
+
+
+
+
+
+
+
+
+
+
+<br><br>
+<br><br>
+______________________________________________
+______________________________________________
+
+<br><br>
+<br><br>
+
+# Useful Docker commands
+
+<br><br>
+
+## Show active container
+```
+sudo docker logs mongo
+sudo docker logs gitlab
+sudo docker logs gitlab-runner
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><br>
+<br><br>
+______________________________________________
+______________________________________________
+
+<br><br>
+<br><br>
+
+
+#  Troubleshooting
 
 <br><br>
 
@@ -7,13 +117,15 @@
 <br><br>
 
 ### Reset Password
-```
+```bash
 sudo docker exec -it gitlab-ce bash
 gitlab-rake "gitlab:password:reset[root]"
 ```
 
+<br><br>
 
-
+### Can nit visit gitlab.local.com for the first start of the dev-environment
+- Try to run again start.sh for second time
 
 
 
