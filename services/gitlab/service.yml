@@ -18,8 +18,8 @@ services:
       - '$GITLAB_HOME/logs:/var/log/gitlab'
       - '$GITLAB_HOME/data:/var/opt/gitlab'
     shm_size: '256m'
-    deploy:
-      resources:
-        limits:
-          cpus: '4'
-          memory: '4G'
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '4'
+    #       memory: '4G'
