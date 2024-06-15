@@ -1,5 +1,9 @@
 # Start
-- If you run this for the first time run `docker network create localdev`. Then `bash start.sh`
+1. Run `sudo gedit /etc/hosts` and add `127.0.0.1 gitlab.local.com`
+
+2. If you run this for the first time run `docker network create localdev`. 
+
+3. Then `bash start.sh`
 
 ```shell
 # sudo bash .start.sh # Startet alle Services
@@ -7,6 +11,16 @@
 # sudo bash ./start.sh --service=mongo,gitlab   # Startet `mongo` und `gitlab` Services
 # sudo bash ./start.sh --service=gitlab-runner    # Startet nur den `gitlab-runner` Service
 ```
+
+4. Change root password for gitlab
+```shell
+sudo docker exec -it gitlab bash
+gitlab-rake "gitlab:password:reset[root]"
+```
+
+
+
+
 
 
 <br><br>
@@ -35,6 +49,11 @@
 
 
 
+
+
+
+
+
 <br><br>
 <br><br>
 ______________________________________________
@@ -53,7 +72,7 @@ ______________________________________________
 <br><br>
 
 ## Gitlab
-- http://gitlab.local.com
+- https://gitlab.local.com
 - http://10.0.1.2
 
 
@@ -118,14 +137,15 @@ ______________________________________________
 
 ### Reset Password
 ```bash
-sudo docker exec -it gitlab-ce bash
+sudo docker exec -it gitlab bash
 gitlab-rake "gitlab:password:reset[root]"
 ```
 
-<br><br>
 
-### Can nit visit gitlab.local.com for the first start of the dev-environment
-- Try to run again start.sh for second time
+
+
+
+
 
 
 

@@ -12,7 +12,7 @@ services:
   gitlab:
     extends:
       file: services/gitlab/service.yml
-      service: web
+      service: gitlab
 
   gitlab-runner:
     depends_on:
