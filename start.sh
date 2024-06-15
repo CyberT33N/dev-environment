@@ -28,7 +28,7 @@ done
 # Wenn kein --services Flag gesetzt ist, alle Services starten
 if [ -z "$services" ]; then
     echo 'docker-compose up all..'
-    sudo docker-compose up
+    sudo docker-compose up -d
     exit 0
 fi
 
@@ -39,11 +39,11 @@ do
     case $service in
         mongo)
           echo 'docker-compose up mongo..'
-          sudo docker-compose up mongo
+          sudo docker-compose up -d mongo
         ;;
         gitlab)
           echo 'docker-compose up gitlab..'
-          sudo docker-compose up gitlab
+          sudo docker-compose up -d gitlab
 
           # sudo docker run --detach \
           #   --hostname gitlab.local.com \
@@ -59,7 +59,7 @@ do
         ;;
         gitlab-runner)
           echo 'docker-compose up gitlab-runner..'
-          sudo docker-compose up gitlab-runner
+          sudo docker-compose up -d gitlab-runner
         ;;
         *)
           # Fehlerbehandlung für unbekannte Services
