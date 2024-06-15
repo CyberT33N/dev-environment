@@ -7,9 +7,9 @@
 
 ```shell
 # sudo bash ./start.sh # Startet alle Services
-# sudo bash ./start.sh --service=mongo     # Startet nur den `mongo` Service
-# sudo bash ./start.sh --service=mongo,gitlab   # Startet `mongo` und `gitlab` Services
-# sudo bash ./start.sh --service=gitlab-runner    # Startet nur den `gitlab-runner` Service
+# sudo bash ./start.sh --services=mongo     # Startet nur den `mongo` Service
+# sudo bash ./start.sh --services=mongo,gitlab   # Startet `mongo` und `gitlab` Services
+# sudo bash ./start.sh --services=gitlab-runner    # Startet nur den `gitlab-runner` Service
 ```
 
 4. Change root password for gitlab
