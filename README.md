@@ -60,13 +60,38 @@ This setup is ideal for developers looking to test, build, and experiment with G
    gitlab-rake "gitlab:password:reset[root]"
    ```
 
----
+
+
+
+
+<br><br><br><br>
+
+# 🌐 URLs
+
+- MongoDB:
+
+  ```
+  mongodb://test:test@localhost:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false
+  ```
+
+<br>
+
+- GitLab:
+
+  - [https://gitlab.local.com](https://gitlab.local.com)
+  - [http://10.0.1.2](http://10.0.1.2)
+
+
+
+
+
+
+
+<br><br><br><br>
 
 ## 🏃‍♂️ Register GitLab Runner (Optional)
 
 ```bash
-## ------------------------------------------------------- ##
-
 # Register the GitLab runner using non-interactive mode
 sudo docker-compose exec gitlab-runner gitlab-runner register \
 --non-interactive \
@@ -80,25 +105,16 @@ sudo docker-compose exec gitlab-runner gitlab-runner register \
 # Alternatively, use interactive mode:
 sudo docker-compose exec gitlab-runner gitlab-runner register
 
-## ------------------------------------------------------- ##
 ```
 
----
 
-# 🌐 URLs
 
-- MongoDB:
 
-  ```
-  mongodb://test:test@localhost:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false
-  ```
 
-- GitLab:
 
-  - [https://gitlab.local.com](https://gitlab.local.com)
-  - [http://10.0.1.2](http://10.0.1.2)
 
----
+
+<br><br><br><br>
 
 # 🛠️ Useful Docker Commands
 
@@ -108,9 +124,19 @@ sudo docker logs gitlab
 sudo docker logs gitlab-runner
 ```
 
----
+
+
+
+
+
+
+
+
+<br><br><br><br>
 
 # ⚙️ Troubleshooting
+
+## Gitlab
 
 ### 🔄 Reset GitLab Password
 
@@ -119,9 +145,16 @@ sudo docker exec -it gitlab bash
 gitlab-rake "gitlab:password:reset[root]"
 ```
 
----
+
+
+
+
+
+<br><br><br><br>
 
 # ⚠️ Known Issues
+
+## MongoDB
 
 ### 🐘 MongoDB: Missing Metrics Interim File
 
@@ -137,9 +170,15 @@ Fix by deleting the `diagnostic.data` folder from the mounted volume:
 sudo rm -rf /srv/mongo/diagnostic.data
 ```
 
+<br>
+
+## GitLab
+
 ### 🚫 GitLab Offline?
 
 - Try running the `start.sh` script again.
+
+<br>
 
 ### 🕒 GitLab Takes Too Long to Respond (502 Error)
 
