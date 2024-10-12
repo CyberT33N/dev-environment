@@ -1,12 +1,13 @@
 #!/bin/bash
 
+# ==================== DOCKER SERVICE MANAGER ====================
 # Script to manage Docker containers defined in docker-compose.yml.
 # Usage examples:
 
-# - Start all services: 
+# 🔄 Start all services: 
 #   sudo bash ./start.sh
 
-# - Start specific services (e.g., mongo, gitlab, gitlab-runner): 
+# 🔄 Start specific services (e.g., mongo, gitlab, gitlab-runner): 
 #   sudo bash ./start.sh --services=mongo
 #   sudo bash ./start.sh --services=gitlab
 #   sudo bash ./start.sh --services=gitlab-runner
@@ -14,22 +15,25 @@
 #
 # This script allows selective service starts using the --services flag.
 
+# ==================== PARAMETER PARSING ====================
 # Parse parameters
 for arg in "$@"; do
     case $arg in
         --services=*)
             services="${arg#*=}"   # Extract services after '='
-            shift                  # Move to the next argument
+            shift                   # Move to the next argument
         ;;
         *)
             # Handle unrecognized parameters (extendable)
+            echo "⚠️ Warning: Unrecognized parameter '$arg'"
         ;;
     esac
 done
 
+# ==================== SERVICE START LOGIC ====================
 # If no --services flag is provided, start all services
 if [ -z "$services" ]; then
-    echo 'Starting all services with docker-compose...'
+    echo '🔄 Starting all services with docker-compose...'
     sudo docker-compose up -d
     exit 0
 fi
@@ -39,11 +43,11 @@ IFS=',' read -ra services_array <<< "$services"  # Split the services by commas
 for service in "${services_array[@]}"; do
     case $service in
         mongo)
-            echo 'Starting mongo service...'
+            echo '🔄 Starting mongo service...'
             sudo docker-compose up -d mongo
         ;;
         gitlab)
-            echo 'Starting gitlab service...'
+            echo '🔄 Starting gitlab service...'
             sudo docker-compose up -d gitlab
 
             # Uncomment this section to manually run the gitlab container
@@ -60,16 +64,17 @@ for service in "${services_array[@]}"; do
             #   gitlab/gitlab-ee:latest
         ;;
         gitlab-runner)
-            echo 'Starting gitlab-runner service...'
+            echo '🔄 Starting gitlab-runner service...'
             sudo docker-compose up -d gitlab-runner
         ;;
         *)
             # Handle unrecognized services
-            echo "Error: Unknown service '$service'"
+            echo "❌ Error: Unknown service '$service'"
         ;;
     esac
 done
 
+# ==================== OPTIONAL COMMANDS ====================
 # Optional: List GitLab runners (if needed)
 # sudo docker-compose exec gitlab-runner gitlab-runner list
 # sudo docker-compose start gitlab-runner
