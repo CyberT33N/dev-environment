@@ -1,73 +1,75 @@
 #!/bin/bash
 
-# Dieses Skript startet die Docker-Container für die Services, die in der `docker-compose.yml` Datei definiert sind.
-# Es kann mit dem `--services` Flag aufgerufen werden, um nur bestimmte Services zu starten.
-# Beispiel:
+# Script to manage Docker containers defined in docker-compose.yml.
+# Usage examples:
 
-# sudo bash .start.sh # Startet alle Services
-# sudo bash ./start.sh --services=mongo     # Startet nur den `mongo` Service
-# sudo bash ./start.sh --services=gitlab     # Startet nur den `gitlab` Service
-# sudo bash ./start.sh --services=mongo,gitlab   # Startet `mongo` und `gitlab` Services
-# sudo bash ./start.sh --services=gitlab-runner    # Startet nur den `gitlab-runner` Service
+# - Start all services: 
+#   sudo bash ./start.sh
 
+# - Start specific services (e.g., mongo, gitlab, gitlab-runner): 
+#   sudo bash ./start.sh --services=mongo
+#   sudo bash ./start.sh --services=gitlab
+#   sudo bash ./start.sh --services=gitlab-runner
+#   sudo bash ./start.sh --services=mongo,gitlab
+#
+# This script allows selective service starts using the --services flag.
 
-# Parameter parsen
-for arg in "$@"
-do
+# Parse parameters
+for arg in "$@"; do
     case $arg in
         --services=*)
-        services="${arg#*=}"
-        shift # Nach dem Parsen des Parameters eine Position nach vorne schieben
+            services="${arg#*=}"   # Extract services after '='
+            shift                  # Move to the next argument
         ;;
         *)
-        # Unbekannte Parameter oder Fehlerbehandlung hier einfügen
+            # Handle unrecognized parameters (extendable)
         ;;
     esac
 done
 
-# Wenn kein --services Flag gesetzt ist, alle Services starten
+# If no --services flag is provided, start all services
 if [ -z "$services" ]; then
-    echo 'docker-compose up all..'
+    echo 'Starting all services with docker-compose...'
     sudo docker-compose up -d
     exit 0
 fi
 
-# Services verarbeiten und entsprechende Aktionen ausführen
-IFS=',' read -ra services_array <<< "$services"
-for service in "${services_array[@]}"
-do
+# Process the provided services
+IFS=',' read -ra services_array <<< "$services"  # Split the services by commas
+for service in "${services_array[@]}"; do
     case $service in
         mongo)
-          echo 'docker-compose up mongo..'
-          sudo docker-compose up -d mongo
+            echo 'Starting mongo service...'
+            sudo docker-compose up -d mongo
         ;;
         gitlab)
-          echo 'docker-compose up gitlab..'
-          sudo docker-compose up -d gitlab
+            echo 'Starting gitlab service...'
+            sudo docker-compose up -d gitlab
 
-          # sudo docker run --detach \
-          #   --hostname gitlab.local.com \
-          #   --env GITLAB_OMNIBUS_CONFIG="external_url 'http://gitlab.local.com'" \
-          #   --publish 443:443 --publish 80:80 --publish 22:22 \
-          #   --name gitlab \
-          #   --restart always \
-          #   --volume $GITLAB_HOME/config:/etc/gitlab:Z \
-          #   --volume $GITLAB_HOME/logs:/var/log/gitlab:Z \
-          #   --volume $GITLAB_HOME/data:/var/opt/gitlab:Z \
-          #   --shm-size 256m \
-          #   gitlab/gitlab-ee:latest
+            # Uncomment this section to manually run the gitlab container
+            # sudo docker run --detach \
+            #   --hostname gitlab.local.com \
+            #   --env GITLAB_OMNIBUS_CONFIG="external_url 'http://gitlab.local.com'" \
+            #   --publish 443:443 --publish 80:80 --publish 22:22 \
+            #   --name gitlab \
+            #   --restart always \
+            #   --volume $GITLAB_HOME/config:/etc/gitlab:Z \
+            #   --volume $GITLAB_HOME/logs:/var/log/gitlab:Z \
+            #   --volume $GITLAB_HOME/data:/var/opt/gitlab:Z \
+            #   --shm-size 256m \
+            #   gitlab/gitlab-ee:latest
         ;;
         gitlab-runner)
-          echo 'docker-compose up gitlab-runner..'
-          sudo docker-compose up -d gitlab-runner
+            echo 'Starting gitlab-runner service...'
+            sudo docker-compose up -d gitlab-runner
         ;;
         *)
-          # Fehlerbehandlung für unbekannte Services
-          echo "Unbekannter Service: $service"
+            # Handle unrecognized services
+            echo "Error: Unknown service '$service'"
         ;;
     esac
 done
 
-# # Optional: Zeige die Liste der GitLab-Runner an und starte ihn
+# Optional: List GitLab runners (if needed)
 # sudo docker-compose exec gitlab-runner gitlab-runner list
 # sudo docker-compose start gitlab-runner

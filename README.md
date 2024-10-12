@@ -1,189 +1,148 @@
-# Start
-1. Run `sudo gedit /etc/hosts` and add `127.0.0.1 gitlab.local.com`
+# 🚀 dev-environment
 
-2. If you run this for the first time run `docker network create localdev`. 
+This project provides a streamlined environment for managing most needed developer services locally using docker-compose. It includes a custom bash script to control Docker containers and a simple configuration guide to quickly get GitLab, MongoDB, and GitLab Runner up and running.
 
-3. Then `bash start.sh`
+### 🛠️ Key Features:
+- **Local GitLab and MongoDB:** Easily spin up GitLab and MongoDB services for development and testing.
+- **Service Control:** Use the `start.sh` script to selectively start specific services (like `mongo` or `gitlab-runner`) without starting the entire stack.
+- **GitLab Runner Management:** Option to register a GitLab Runner for CI/CD pipelines in non-interactive or interactive mode.
 
-```shell
-# sudo bash ./start.sh # Startet alle Services
-# sudo bash ./start.sh --services=mongo     # Startet nur den `mongo` Service
-# sudo bash ./start.sh --services=mongo,gitlab   # Startet `mongo` und `gitlab` Services
-# sudo bash ./start.sh --services=gitlab-runner    # Startet nur den `gitlab-runner` Service
-```
+This setup is ideal for developers looking to test, build, and experiment with GitLab CI pipelines and MongoDB databases in a controlled local environment.
 
-4. Change root password for gitlab
-```shell
-sudo docker exec -it gitlab bash
-gitlab-rake "gitlab:password:reset[root]"
-```
+1. 🖥️ Open the `/etc/hosts` file and add the following line:
 
+   ```bash
+   sudo gedit /etc/hosts
+   ```
 
+   Add:
 
+   ```
+   127.0.0.1 gitlab.local.com
+   ```
 
+2. 🛠️ If this is your first run, create the Docker network:
 
+   ```bash
+   docker network create localdev
+   ```
 
-<br><br>
+3. 📜 Start services with the `start.sh` script:
 
-## Register Gitlab Runner
-- Maybe not needed
-```
+   - To start all services:
+
+     ```bash
+     sudo bash ./start.sh
+     ```
+
+   - To start only specific services like `mongo`:
+
+     ```bash
+     sudo bash ./start.sh --services=mongo
+     ```
+
+   - Start `mongo` and `gitlab`:
+
+     ```bash
+     sudo bash ./start.sh --services=mongo,gitlab
+     ```
+
+   - Start `gitlab-runner`:
+
+     ```bash
+     sudo bash ./start.sh --services=gitlab-runner
+     ```
+
+4. 🔐 Change the root password for GitLab:
+
+   ```bash
+   sudo docker exec -it gitlab bash
+   gitlab-rake "gitlab:password:reset[root]"
+   ```
+
+---
+
+## 🏃‍♂️ Register GitLab Runner (Optional)
+
+```bash
 ## ------------------------------------------------------- ##
 
-#echo 'register gitlab-runner..'
-#sudo docker-compose exec gitlab-runner gitlab-runner register \
-#--non-interactive \
-#--url http://gitlab.local.com/ \
-#--tag-list "test" \
-#--registration-token xxxxxxxxxxxxx \
-#--executor docker \
-#--docker-image node:18.2.0 \
-#--docker-network-mode localdev
+# Register the GitLab runner using non-interactive mode
+sudo docker-compose exec gitlab-runner gitlab-runner register \
+--non-interactive \
+--url http://gitlab.local.com/ \
+--tag-list "test" \
+--registration-token xxxxxxxxxxxxx \
+--executor docker \
+--docker-image node:18.2.0 \
+--docker-network-mode localdev
 
-# Alternative you can use the interactive mode:
-# sudo docker-compose exec gitlab-runner gitlab-runner register
+# Alternatively, use interactive mode:
+sudo docker-compose exec gitlab-runner gitlab-runner register
 
 ## ------------------------------------------------------- ##
 ```
 
+---
 
+# 🌐 URLs
 
+- MongoDB:
 
+  ```
+  mongodb://test:test@localhost:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false
+  ```
 
+- GitLab:
 
+  - [https://gitlab.local.com](https://gitlab.local.com)
+  - [http://10.0.1.2](http://10.0.1.2)
 
+---
 
+# 🛠️ Useful Docker Commands
 
-<br><br>
-<br><br>
-______________________________________________
-______________________________________________
-
-<br><br>
-<br><br>
-
-# URL's
-
-<br><br>
-
-## MongoDB
-- mongodb://test:test@localhost:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false
-
-<br><br>
-
-## Gitlab
-- https://gitlab.local.com
-- http://10.0.1.2
-
-
-
-
-
-
-
-
-
-
-<br><br>
-<br><br>
-______________________________________________
-______________________________________________
-
-<br><br>
-<br><br>
-
-# Useful Docker commands
-
-<br><br>
-
-## Show active container
-```
+```bash
 sudo docker logs mongo
 sudo docker logs gitlab
 sudo docker logs gitlab-runner
 ```
 
+---
 
+# ⚙️ Troubleshooting
 
+### 🔄 Reset GitLab Password
 
-
-
-
-
-
-
-
-
-
-
-
-
-<br><br>
-<br><br>
-______________________________________________
-______________________________________________
-
-<br><br>
-<br><br>
-
-
-#  Troubleshooting
-
-<br><br>
-
-## Gitlab
-
-<br><br>
-
-### Reset Password
 ```bash
 sudo docker exec -it gitlab bash
 gitlab-rake "gitlab:password:reset[root]"
 ```
 
+---
 
+# ⚠️ Known Issues
 
+### 🐘 MongoDB: Missing Metrics Interim File
 
+If you encounter the following error:
 
-
-
-
-
-
-
-
-
-
-
-<br><br>
-<br><br>
-______________________________________________
-______________________________________________
-
-<br><br>
-<br><br>
-
-# Known problems
-
-<br><br>
-
-## Mongo
-
-<br><br>
-
-### find: '/data/db/diagnostic.data/metrics.interim': No such file or directory
-- We delete the folder diagnostic.data from our mounted volume and then mongo will re-create it:
 ```
+find: '/data/db/diagnostic.data/metrics.interim': No such file or directory
+```
+
+Fix by deleting the `diagnostic.data` folder from the mounted volume:
+
+```bash
 sudo rm -rf /srv/mongo/diagnostic.data
 ```
 
-<br><br>
+### 🚫 GitLab Offline?
 
-## gitlab.local.com is offline
-- Try to run again start.sh
+- Try running the `start.sh` script again.
 
-<br><br>
+### 🕒 GitLab Takes Too Long to Respond (502 Error)
 
-## 502 - Whoops, GitLab is taking too much time to respond
-- Gitlab will take a lot of time max 5-10 minutes to fully initialise after starting the docker container.
-  - In some cases it will not load does not matter how long you will wait. In my case the problem resolved itself by a fe restarts. Still not sure why it was randomly working again. However, I was editing the cpu resources for gitlab & gitlab_runner. Maybe this was the reason.
+- GitLab can take 5-10 minutes to initialize on slow computers. In some cases, it may require multiple restarts to resolve.
+
+- Adjust CPU resources for `gitlab` and `gitlab_runner` if the issue persists.
