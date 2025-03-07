@@ -1,62 +1,94 @@
 # 🚀 dev-environment
 
-This project provides a streamlined environment for managing most needed developer services locally using docker-compose. It includes a custom bash script to control Docker containers and a simple configuration guide to quickly get GitLab, MongoDB, and GitLab Runner up and running.
+This project provides a streamlined environment for managing most needed developer services locally using docker-compose. It includes custom scripts (PowerShell for Windows, Bash for Linux) to control Docker containers and a simple configuration guide to quickly get GitLab, MongoDB, and GitLab Runner up and running.
 
 ### 🛠️ Key Features:
 - **Local GitLab and MongoDB:** Easily spin up GitLab and MongoDB services for development and testing.
-- **Service Control:** Use the `start.sh` script to selectively start specific services (like `mongo` or `gitlab-runner`) without starting the entire stack.
+- **Service Control:** Use the `start.sh` (Linux) or `start.ps1` (Windows) script to selectively start specific services.
 - **GitLab Runner Management:** Option to register a GitLab Runner for CI/CD pipelines in non-interactive or interactive mode.
+- **Cross-Platform Support:** Works on both Windows and Linux systems.
 
 This setup is ideal for developers looking to test, build, and experiment with GitLab CI pipelines and MongoDB databases in a controlled local environment.
 
 1. 🖥️ Open the `/etc/hosts` file and add the following line:
 
+   Linux:
    ```bash
    sudo gedit /etc/hosts
    ```
 
-   Add:
+   Windows (Open terminal as admin):
+   ```powershell
+   notepad C:\Windows\System32\drivers\etc\hosts
+   ```
 
+   Add:
    ```
    127.0.0.1 gitlab.local.com
    ```
 
 2. 🛠️ If this is your first run, create the Docker network:
 
+   Linux:
    ```bash
    docker network create localdev
    ```
 
-3. 📜 Start services with the `start.sh` script:
+   Windows:
+   ```powershell
+   docker network create localdev
+   ```
 
+3. 📜 Start services with the script:
+
+   Linux (using start.sh):
    - To start all services:
-
      ```bash
      sudo bash ./start.sh
      ```
 
    - To start only specific services like `mongo`:
-
      ```bash
      sudo bash ./start.sh --services=mongo
      ```
 
    - Start `mongo` and `gitlab`:
-
      ```bash
      sudo bash ./start.sh --services=mongo,gitlab
      ```
 
-   - Start `gitlab-runner`:
+   Windows (using start.ps1):
+   - To start all services:
+     ```powershell
+     .\start.ps1
+     ```
 
-     ```bash
-     sudo bash ./start.sh --services=gitlab-runner
+   - To start only specific services like `mongo`:
+     ```powershell
+     .\start.ps1 -services "mongo"
+     ```
+
+   - Start `mongo` and `gitlab`:
+     ```powershell
+     .\start.ps1 -services "mongo,gitlab"
+     ```
+
+   - Start database services:
+     ```powershell
+     .\start.ps1 -services "firebird,mssql,postgres"
      ```
 
 4. 🔐 Change the root password for GitLab:
 
+   Linux:
    ```bash
    sudo docker exec -it gitlab bash
+   gitlab-rake "gitlab:password:reset[root]"
+   ```
+
+   Windows:
+   ```powershell
+   docker exec -it gitlab bash
    gitlab-rake "gitlab:password:reset[root]"
    ```
 
@@ -73,6 +105,40 @@ This setup is ideal for developers looking to test, build, and experiment with G
   ```
   mongodb://test:test@localhost:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false
   ```
+
+<br>
+
+- PostgreSQL:
+
+  ```
+  postgresql://test:test@localhost:5432/testdb
+  ```
+
+  Verbindungsparameter für pgAdmin:
+  - Host: localhost
+  - Port: 5432
+  - Database: testdb
+  - Username: test
+  - Password: test
+
+<br>
+
+- Firebird:
+  - Create this folder:
+  ```powershell
+  New-Item -ItemType Directory -Path "$env:USERPROFILE\data\firebird" -Force
+  ```
+
+  Verbindungsparameter:
+  - Host: localhost
+  - Port: 3050
+  - Database/Path: /var/lib/firebird/data/testdb.fdb
+  - SYSDBA Credentials:
+    - Username: SYSDBA
+    - Password: masterkey
+  - Test User Credentials:
+    - Username: test
+    - Password: test
 
 <br>
 
