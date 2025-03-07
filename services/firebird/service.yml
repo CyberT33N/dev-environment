@@ -13,7 +13,7 @@ services:
     ports:
       - "3050:3050"
     volumes:
-      - ${FIREBIRD_HOME:-./data/firebird}:/var/lib/firebird/data
+      - ${FIREBIRD_HOME:-~/data/firebird}:/var/lib/firebird/data
     healthcheck:
       test: ["CMD", "isql", "-user", "SYSDBA", "-password", "masterkey", "localhost:testdb.fdb"]
       interval: 10s
