@@ -5,13 +5,39 @@ This project provides a streamlined environment for managing most needed develop
 ## 📋 Dependencies
 
 ### Windows
-- **Docker Desktop**: Muss installiert werden, da docker-compose mit Docker Desktop mitgeliefert wird.
+
+#### **Docker Desktop**
+- Muss installiert werden, da docker-compose mit Docker Desktop mitgeliefert wird.
+
+#### **Firebird Datenordner**
+- Erstelle den Ordner für Firebird-Daten:
+  ```powershell
+  New-Item -ItemType Directory -Path "$env:USERPROFILE\data\firebird" -Force
+  ```
+
+<br><br>
 
 ### Linux
 - **Docker Engine**
 - **Docker Compose**
 
-### 🛠️ Key Features:
+
+
+
+
+
+
+
+
+<br><br>
+________
+________
+<br><br>
+
+
+
+
+# 🛠️ Key Features:
 - **Local GitLab and MongoDB:** Easily spin up GitLab and MongoDB services for development and testing.
 - **Service Control:** Use the `start.sh` (Linux) or `start.ps1` (Windows) script to selectively start specific services.
 - **GitLab Runner Management:** Option to register a GitLab Runner for CI/CD pipelines in non-interactive or interactive mode.
