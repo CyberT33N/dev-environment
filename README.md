@@ -2,6 +2,15 @@
 
 This project provides a streamlined environment for managing most needed developer services locally using docker-compose. It includes custom scripts (PowerShell for Windows, Bash for Linux) to control Docker containers and a simple configuration guide to quickly get GitLab, MongoDB, and GitLab Runner up and running.
 
+## 📋 Dependencies
+
+### Windows
+- **Docker Desktop**: Muss installiert werden, da docker-compose mit Docker Desktop mitgeliefert wird.
+
+### Linux
+- **Docker Engine**
+- **Docker Compose**
+
 ### 🛠️ Key Features:
 - **Local GitLab and MongoDB:** Easily spin up GitLab and MongoDB services for development and testing.
 - **Service Control:** Use the `start.sh` (Linux) or `start.ps1` (Windows) script to selectively start specific services.
@@ -202,6 +211,19 @@ sudo docker logs gitlab-runner
 
 # ⚙️ Troubleshooting
 
+## docker-copmpose
+
+### 🖼️ `Unable to Get Image` Error
+
+Wenn der Fehler `unable to get image` auftritt:
+- Stelle sicher, dass Docker Desktop (unter Windows) gestartet ist
+- Überprüfe deine Internetverbindung
+- Versuche das Image manuell zu pullen: `docker pull <image-name>`
+
+
+<br><br>
+
+
 ## Gitlab
 
 ### 🔄 Reset GitLab Password
@@ -212,13 +234,7 @@ gitlab-rake "gitlab:password:reset[root]"
 ```
 
 
-
-
-
-
-<br><br><br><br>
-
-# ⚠️ Known Issues
+<br><br>
 
 ## MongoDB
 
