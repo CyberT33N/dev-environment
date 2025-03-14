@@ -1,7 +1,7 @@
 networks:
   default:
-    external:
-      name: localdev
+    name: localdev
+    external: true
 
 services:
   mongo:
