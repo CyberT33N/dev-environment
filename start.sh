@@ -7,11 +7,14 @@
 # 🔄 Start all services: 
 #   sudo bash ./start.sh
 
-# 🔄 Start specific services (e.g., mongo, gitlab, gitlab-runner): 
+# 🔄 Start specific services (e.g., mongo, gitlab, gitlab-runner, firebird, mssql, postgres): 
 #   sudo bash ./start.sh --services=mongo
 #   sudo bash ./start.sh --services=gitlab
 #   sudo bash ./start.sh --services=gitlab-runner
 #   sudo bash ./start.sh --services=mongo,gitlab
+#   sudo bash ./start.sh --services=firebird
+#   sudo bash ./start.sh --services=mssql
+#   sudo bash ./start.sh --services=postgres
 #
 # This script allows selective service starts using the --services flag.
 
@@ -66,6 +69,18 @@ for service in "${services_array[@]}"; do
         gitlab-runner)
             echo '🔄 Starting gitlab-runner service...'
             sudo docker-compose up -d gitlab-runner
+        ;;
+        firebird)
+            echo '🔄 Starting Firebird service...'
+            sudo docker-compose up -d firebird
+        ;;
+        mssql)
+            echo '🔄 Starting MS SQL Server service...'
+            sudo docker-compose up -d mssql
+        ;;
+        postgres)
+            echo '🔄 Starting PostgreSQL service...'
+            sudo docker-compose up -d postgres
         ;;
         *)
             # Handle unrecognized services

@@ -1,7 +1,7 @@
 networks:
   default:
-    external:
-      name: localdev
+    name: localdev
+    external: true
 
 services:
   mongo:
@@ -20,3 +20,18 @@ services:
     extends:
       file: services/gitlab-runner/service.yml
       service: gitlab-runner
+
+  postgres:
+    extends:
+      file: services/postgres/service.yml
+      service: postgres
+
+  firebird:
+    extends:
+      file: services/firebird/service.yml
+      service: firebird
+
+  mssql:
+    extends:
+      file: services/mssql/service.yml
+      service: mssql
