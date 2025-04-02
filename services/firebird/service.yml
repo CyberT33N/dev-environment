@@ -2,20 +2,33 @@ version: '3.8'
 
 services:
   firebird:
-    image: firebirdsql/firebird:latest
+    # https://hub.docker.com/r/jacobalberty/firebird
+    image: jacobalberty/firebird:2.5.8-ss
     environment:
-      - FIREBIRD_ROOT_PASSWORD=masterkey
+      - ISC_PASSWORD=masterkey
       - FIREBIRD_USER=test
       - FIREBIRD_PASSWORD=test
       - FIREBIRD_DATABASE=testdb.fdb
-      - FIREBIRD_DATABASE_DEFAULT_CHARSET=UTF8
+      - EnableLegacyClientAuth=true
+      - EnableWireCrypt=false
+      - DataTypeCompatibility=2.5
       - TZ=Europe/Berlin
     ports:
       - "3050:3050"
     volumes:
-      - ${FIREBIRD_HOME:-~/data/firebird}:/var/lib/firebird/data
+      - ${FIREBIRD_HOME:-~/data/firebird}/data:/firebird/data
+      - ${FIREBIRD_HOME:-~/data/firebird}/system:/firebird/system
+      - ${FIREBIRD_HOME:-~/data/firebird}/etc:/firebird/etc
     healthcheck:
-      test: ["CMD", "isql", "-user", "SYSDBA", "-password", "masterkey", "localhost:testdb.fdb"]
-      interval: 10s
-      timeout: 5s
-      retries: 5 
+      test: ["CMD-SHELL", "nc -z localhost 3050"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  firebird_data:
+    driver: local
+  firebird_system:
+    driver: local
+  firebird_etc:
+    driver: local
