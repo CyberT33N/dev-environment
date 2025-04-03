@@ -16,6 +16,7 @@ services:
     ports:
       - "3050:3050"
     volumes:
+      - C:/EVIDENT:/firebird/evident
       - ${FIREBIRD_HOME:-~/data/firebird}/data:/firebird/data
       - ${FIREBIRD_HOME:-~/data/firebird}/system:/firebird/system
       - ${FIREBIRD_HOME:-~/data/firebird}/etc:/firebird/etc
