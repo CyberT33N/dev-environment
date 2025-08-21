@@ -1,2 +1,6 @@
 services/gitlab-runner/config
 /.specstory
+
+
+# ==== MSSQL ====
+services/mssql/data/*

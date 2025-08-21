@@ -29,11 +29,13 @@ This project provides a streamlined environment for managing most needed develop
 
 
 
-<br><br>
-________
-________
+
+
 <br><br>
 
+---
+
+<br><br>
 
 
 
@@ -131,9 +133,111 @@ This setup is ideal for developers looking to test, build, and experiment with G
 
 
 
-<br><br><br><br>
 
-# 🌐 URLs
+
+
+
+
+
+
+
+
+<br><br>
+
+---
+
+<br><br>
+
+# 🌐 Connection Details
+
+## MSSQL
+
+<details><summary>Click to expand..</summary>
+
+
+```
+# 🎯 Standard DBI-Verbindung (lokales Development)
+Host:     localhost
+Port:     1433  
+Database: master          # Default System-DB
+Username: sa              # System Administrator
+Password: Test1234!       # Wie in service.yml konfiguriert
+```
+
+
+
+## **📝 MSSQL DBI-Verbindungsdaten - Enterprise-Dokumentation**
+
+**✅ Ihre Verbindungsdaten sind KORREKT:**
+
+```yaml
+# 🎯 Standard DBI-Verbindung (lokales Development)
+Host:     localhost
+Port:     1433  
+Database: master          # Default System-DB
+Username: sa              # System Administrator
+Password: Test1234!       # Wie in service.yml konfiguriert
+```
+
+### **🔧 Zusätzliche Verbindungsoptionen:**
+
+```yaml
+# Alternative Hosts (je nach Setup):
+Host Alternativen:
+  - localhost           # ✅ Standard (Host → Container)
+  - 127.0.0.1          # ✅ IP-Adresse
+  - mssql-dev           # ❌ Nur container-intern
+
+# Erweiterte Verbindungsparameter:
+Instance:     ""          # Leer (keine Named Instance)
+Schema:       dbo         # Default Schema
+Encryption:   Optional    # -No Flag im Healthcheck
+Trust Cert:   Yes         # Für Development
+```
+
+### **📋 Connection String-Varianten:**
+
+**ODBC Connection String:**
+```
+Driver={ODBC Driver 18 for SQL Server};Server=localhost,1433;Database=master;UID=sa;PWD=Test1234!;Encrypt=Optional;TrustServerCertificate=Yes;
+```
+
+**ADO.NET Connection String:**
+```
+Server=localhost,1433;Database=master;User Id=sa;Password=Test1234!;Encrypt=Optional;TrustServerCertificate=True;
+```
+
+**JDBC URL:**
+```
+jdbc:sqlserver://localhost:1433;database=master;user=sa;password=Test1234!;encrypt=optional;trustServerCertificate=true;
+```
+
+### **🗄️ Verfügbare Standard-Datenbanken:**
+
+```sql
+-- System-Datenbanken (immer vorhanden):
+master    -- ✅ Ihre Auswahl - System-Metadaten
+model     -- Template für neue DBs  
+msdb      -- SQL Agent, Backups, Jobs
+tempdb    -- Temporäre Objekte
+```
+
+### **🧪 Verbindungstest via Terminal:**
+
+```powershell
+# Test der Verbindung:
+docker exec -it mssql-dev /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Test1234! -No -Q "SELECT @@VERSION"
+```
+
+</details>
+
+
+
+
+
+
+
+<br><br>
 
 - MongoDB:
 
@@ -141,7 +245,10 @@ This setup is ideal for developers looking to test, build, and experiment with G
   mongodb://test:test@localhost:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false
   ```
 
-<br>
+
+
+
+<br><br>
 
 - PostgreSQL:
 
@@ -156,7 +263,10 @@ This setup is ideal for developers looking to test, build, and experiment with G
   - Username: test
   - Password: test
 
-<br>
+
+
+
+<br><br>
 
 - Firebird:
   - Create this folder:
@@ -175,7 +285,13 @@ This setup is ideal for developers looking to test, build, and experiment with G
     - Username: test
     - Password: test
 
-<br>
+
+
+
+
+<br><br>
+
+
 
 - GitLab:
 
@@ -188,7 +304,20 @@ This setup is ideal for developers looking to test, build, and experiment with G
 
 
 
-<br><br><br><br>
+
+
+
+
+
+
+
+
+
+<br><br>
+
+---
+
+<br><br>
 
 ## 🏃‍♂️ Register GitLab Runner (Optional)
 
@@ -215,15 +344,6 @@ sudo docker-compose exec gitlab-runner gitlab-runner register
 
 
 
-<br><br><br><br>
-
-# 🛠️ Useful Docker Commands
-
-```bash
-sudo docker logs mongo
-sudo docker logs gitlab
-sudo docker logs gitlab-runner
-```
 
 
 
@@ -233,7 +353,19 @@ sudo docker logs gitlab-runner
 
 
 
-<br><br><br><br>
+
+
+
+
+
+
+
+
+<br><br>
+
+---
+
+<br><br>
 
 # ⚙️ Troubleshooting
 
