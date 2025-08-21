@@ -195,6 +195,24 @@ Encryption:   Optional    # -No Flag im Healthcheck
 Trust Cert:   Yes         # Für Development
 ```
 
+
+### **🔧 Microsoft SQL Server Management Studio**
+
+Datei > Neu > Abfrage mit aktueller Verbindung
+
+Server Type: Datenbank-Engine
+```yaml
+Server Type: Datenbank-Engine
+Server Name: localhost,1433
+Authentifizierung: SQL Server-Authentifizierung
+Username: sa              # System Administrator
+Password: Test1234!       # Wie in service.yml konfiguriert
+
+Verschlüsellung: Obligatorisch
+- Check at Trust Server Zertifikat
+```
+
+
 ### **📋 Connection String-Varianten:**
 
 **ODBC Connection String:**
