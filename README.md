@@ -198,7 +198,7 @@ Trust Cert:   Yes         # Für Development
 
 ### **🔧 Microsoft SQL Server Management Studio**
 
-Datei > Neu > Abfrage mit aktueller Verbindung
+Ansicht > Objekt Explorer  > Neu > Abfrage mit aktueller Verbindung
 
 Server Type: Datenbank-Engine
 ```yaml
