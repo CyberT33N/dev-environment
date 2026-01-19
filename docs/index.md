@@ -13,5 +13,6 @@
 - [CI / GitLab Runner](./ci/gitlab-runner.md)
 - [Troubleshooting](./troubleshooting/index.md)
   - [Docker Compose](./troubleshooting/docker-compose.md)
+  - [Database](./troubleshooting/database/index.md)
   - [GitLab](./troubleshooting/gitlab.md)
   - [MongoDB](./troubleshooting/mongodb.md)

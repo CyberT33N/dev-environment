@@ -25,6 +25,40 @@ services:
       - mssql-data:/var/opt/mssql
     restart: "no"
 
+  # One-shot post-start config for SQL Server memory tuning.
+  # Why: Under heavy imports SQL Server can trigger memory pressure (Error 701) and close TCP connections.
+  # This container runs once after MSSQL becomes healthy and sets `max server memory (MB)`.
+  #
+  # Reference: https://hub.docker.com/r/microsoft/mssql-server
+  mssql-config:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql-dev-config
+    depends_on:
+      mssql:
+        condition: service_healthy
+    environment:
+      MSSQL_SA_PASSWORD: "Test1234!"
+      # Default is intentionally moderate (safe-by-default for dev machines).
+      # Override by setting MSSQL_MAX_SERVER_MEMORY_MB (e.g. in your shell env or a .env file).
+      MSSQL_MAX_SERVER_MEMORY_MB: "${MSSQL_MAX_SERVER_MEMORY_MB:-6144}"
+      # Import-friendly defaults (optional overrides)
+      MSSQL_MAXDOP: "${MSSQL_MAXDOP:-4}"
+      MSSQL_COST_THRESHOLD_FOR_PARALLELISM: "${MSSQL_COST_THRESHOLD_FOR_PARALLELISM:-50}"
+    entrypoint:
+      - /bin/bash
+      - -lc
+    command:
+      - >
+        /opt/mssql-tools18/bin/sqlcmd -S mssql -U sa -P "$${MSSQL_SA_PASSWORD}" -No -Q
+        "EXEC sp_configure 'show advanced options', 1; RECONFIGURE;
+         EXEC sp_configure 'max server memory (MB)', $${MSSQL_MAX_SERVER_MEMORY_MB}; RECONFIGURE;
+         EXEC sp_configure 'optimize for ad hoc workloads', 1; RECONFIGURE;
+         EXEC sp_configure 'max degree of parallelism', $${MSSQL_MAXDOP}; RECONFIGURE;
+         EXEC sp_configure 'cost threshold for parallelism', $${MSSQL_COST_THRESHOLD_FOR_PARALLELISM}; RECONFIGURE;
+         DBCC FREESYSTEMCACHE('SQL Plans');
+         DBCC FREEPROCCACHE;"
+    restart: "no"
+
   mongo:
     extends:
       file: services/mongo/service.yml
@@ -62,3 +96,8 @@ services:
     # Override volume strategy to ensure we *only* use the Docker-managed volume.
     volumes:
       - mssql-data:/var/opt/mssql
+    # Memory settings (defaults are intentionally moderate / safe-by-default for dev machines).
+    # Override by setting MSSQL_MEM_LIMIT / MSSQL_MEM_RESERVATION (e.g. in your shell env or a .env file).
+    mem_limit: ${MSSQL_MEM_LIMIT:-8g}
+    mem_reservation: ${MSSQL_MEM_RESERVATION:-4g}
+

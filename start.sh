@@ -76,7 +76,8 @@ for service in "${services_array[@]}"; do
         ;;
         mssql)
             echo '🔄 Starting MS SQL Server service...'
-            sudo docker-compose up -d mssql
+            # Also run the one-shot post-start config (max server memory) to avoid OOM/TCP disconnects during heavy imports.
+            sudo docker-compose up -d mssql mssql-config
         ;;
         postgres)
             echo '🔄 Starting PostgreSQL service...'

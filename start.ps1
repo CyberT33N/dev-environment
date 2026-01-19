@@ -48,7 +48,8 @@ foreach ($service in $servicesArray) {
         }
         "mssql" {
             Write-Host "🔄 Starte MS SQL Server Service..." -ForegroundColor Cyan
-            docker-compose up -d mssql
+            # Also run the one-shot post-start config (max server memory) to avoid OOM/TCP disconnects during heavy imports.
+            docker-compose up -d mssql mssql-config
         }
         "postgres" {
             Write-Host "🔄 Starte PostgreSQL Service..." -ForegroundColor Cyan
@@ -63,4 +64,5 @@ foreach ($service in $servicesArray) {
 # ==================== OPTIONAL COMMANDS ====================
 # Optional: GitLab Runner auflisten (bei Bedarf)
 # docker-compose exec gitlab-runner gitlab-runner list
-# docker-compose start gitlab-runner 
+# docker-compose start gitlab-runner
+
