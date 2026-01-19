@@ -247,6 +247,34 @@ tempdb    -- Temporäre Objekte
 docker exec -it mssql-dev /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Test1234! -No -Q "SELECT @@VERSION"
 ```
 
+### **💾 Persistenz / Storage (wichtig für Windows/WSL2)**
+
+- MSSQL verwendet standardmäßig ein **Docker-managed Named Volume** `mssql-data` statt eines Windows-Bind-Mounts.
+- Hintergrund: SQL Server 2022 läuft im Container als **non-root** User `mssql` (UID **10001**) und braucht Schreibrechte auf `/var/opt/mssql`.
+- Dafür gibt es einen **one-shot Init-Container** `mssql-dev-init`, der die Volume-Rechte einmalig korrekt setzt (SQL selbst läuft weiterhin non-root).
+
+### **🧯 Troubleshooting: `Access is denied` / `HRESULT 0x80070005` beim Start**
+
+Symptom (Logs):
+
+```
+Setup FAILED copying system data file ... to '/var/opt/mssql/data/master.mdf': 5(Access is denied.)
+BootstrapSystemDataDirectories() failure (HRESULT 0x80070005)
+```
+
+Ursache:
+- Fast immer ein **Permission-Problem** durch einen **Windows-Bind-Mount** nach `/var/opt/mssql/...` (z.B. Projekt liegt unter `C:\...`).
+
+Fix:
+- Stelle sicher, dass du die aktuelle Konfiguration nutzt (Named Volume + `mssql-dev-init`).
+- Falls du “Altlasten” entfernen willst:
+
+```powershell
+# Stop + Cleanup (löscht auch DB-Daten im Volume!)
+docker compose down -v
+docker compose up -d mssql
+```
+
 </details>
 
 

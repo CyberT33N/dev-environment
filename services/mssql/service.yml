@@ -13,9 +13,10 @@ services:
       - "1433:1433"
     
     volumes:
-      # CRITICAL: Map only /data subdirectory - full /var/opt/mssql mapping crashes on Windows/WSL2
-      # https://stackoverflow.com/questions/65307784/mssql-container-fails-to-start-when-mapping-volumes-after-upgrading-to-wsl2
-      - ${MSSQL_HOME:-./data}:/var/opt/mssql/data
+      # Use a Docker-managed named volume by default (reliable on Windows/WSL2 + non-root MSSQL).
+      # NOTE: The root compose file declares the volume and also runs a one-shot init container
+      # that sets the correct ownership/permissions for SQL Server 2022 (user mssql, UID 10001).
+      - mssql-data:/var/opt/mssql
     
     healthcheck:
       test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Test1234! -No -Q 'SELECT 1' || exit 1"]

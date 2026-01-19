@@ -3,7 +3,28 @@ networks:
     name: localdev
     external: true
 
+volumes:
+  # Docker-managed volume for MSSQL (works reliably on Windows/WSL2 + Linux)
+  mssql-data:
+
 services:
+  # One-shot init container to fix permissions on the MSSQL volume for SQL Server 2022 non-root.
+  # SQL Server runs as user `mssql` (UID 10001), so the data directory must be writable by 10001.
+  mssql-init:
+    image: alpine:3.19
+    container_name: mssql-dev-init
+    user: "0:0"
+    command:
+      - sh
+      - -c
+      - >
+        mkdir -p /var/opt/mssql/data /var/opt/mssql/log /var/opt/mssql/secrets &&
+        chown -R 10001:0 /var/opt/mssql &&
+        chmod -R g=u /var/opt/mssql
+    volumes:
+      - mssql-data:/var/opt/mssql
+    restart: "no"
+
   mongo:
     extends:
       file: services/mongo/service.yml
@@ -32,6 +53,12 @@ services:
       service: firebird
 
   mssql:
+    depends_on:
+      mssql-init:
+        condition: service_completed_successfully
     extends:
       file: services/mssql/service.yml
       service: mssql
+    # Override volume strategy to ensure we *only* use the Docker-managed volume.
+    volumes:
+      - mssql-data:/var/opt/mssql
