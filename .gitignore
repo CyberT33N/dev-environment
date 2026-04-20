@@ -1,5 +1,6 @@
 services/gitlab-runner/config
 /.specstory
+logs/
 
 
 # ==== MSSQL ====
