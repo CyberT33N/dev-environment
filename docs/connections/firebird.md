@@ -3,6 +3,7 @@
 ## Create data folder
 
 ```powershell
+# C:\Users\<DeinBenutzername>\data\firebird
 New-Item -ItemType Directory -Path "$env:USERPROFILE\data\firebird" -Force
 ```
 
