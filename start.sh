@@ -3,11 +3,11 @@
 # ==================== DOCKER SERVICE MANAGER ====================
 # Script to manage Docker containers defined in docker-compose.yml.
 # Usage examples:
-
-# 🔄 Start all services: 
+#
+# Start all services:
 #   sudo bash ./start.sh
-
-# 🔄 Start specific services (e.g., mongo, gitlab, gitlab-runner, firebird, mssql, postgres): 
+#
+# Start specific services (e.g. mongo, gitlab, gitlab-runner, firebird, mssql, postgres):
 #   sudo bash ./start.sh --services=mongo
 #   sudo bash ./start.sh --services=gitlab
 #   sudo bash ./start.sh --services=gitlab-runner
@@ -15,77 +15,93 @@
 #   sudo bash ./start.sh --services=firebird
 #   sudo bash ./start.sh --services=mssql
 #   sudo bash ./start.sh --services=postgres
-#
-# This script allows selective service starts using the --services flag.
+
+resolve_firebird_home() {
+    if [ -n "${FIREBIRD_HOME:-}" ]; then
+        printf '%s\n' "$FIREBIRD_HOME"
+        return
+    fi
+
+    printf '%s\n' "$HOME/data/firebird"
+}
+
+initialize_firebird_home() {
+    local firebird_home
+
+    firebird_home="$(resolve_firebird_home)"
+    mkdir -p "$firebird_home/data" "$firebird_home/system" "$firebird_home/etc"
+    export FIREBIRD_HOME="$firebird_home"
+}
+
+ensure_docker_network() {
+    if ! sudo docker network inspect localdev >/dev/null 2>&1; then
+        sudo docker network create localdev >/dev/null
+        echo "Created Docker network 'localdev'."
+    fi
+}
+
+run_compose() {
+    sudo FIREBIRD_HOME="${FIREBIRD_HOME:-}" docker-compose "$@"
+}
 
 # ==================== PARAMETER PARSING ====================
-# Parse parameters
 for arg in "$@"; do
     case $arg in
         --services=*)
-            services="${arg#*=}"   # Extract services after '='
-            shift                   # Move to the next argument
+            services="${arg#*=}"
+            shift
         ;;
         *)
-            # Handle unrecognized parameters (extendable)
-            echo "⚠️ Warning: Unrecognized parameter '$arg'"
+            echo "Warning: unrecognized parameter '$arg'"
         ;;
     esac
 done
 
 # ==================== SERVICE START LOGIC ====================
-# If no --services flag is provided, start all services
 if [ -z "$services" ]; then
-    echo '🔄 Starting all services with docker-compose...'
-    sudo docker-compose up -d
+    initialize_firebird_home
+    ensure_docker_network
+    echo "Starting all services with docker-compose..."
+    run_compose up -d
     exit 0
 fi
 
-# Process the provided services
-IFS=',' read -ra services_array <<< "$services"  # Split the services by commas
+IFS=',' read -ra services_array <<< "$services"
 for service in "${services_array[@]}"; do
-    case $service in
+    case "$service" in
         mongo)
-            echo '🔄 Starting mongo service...'
-            sudo docker-compose up -d mongo
+            ensure_docker_network
+            echo "Starting mongo service..."
+            run_compose up -d mongo
         ;;
         gitlab)
-            echo '🔄 Starting gitlab service...'
-            sudo docker-compose up -d gitlab
-
-            # Uncomment this section to manually run the gitlab container
-            # sudo docker run --detach \
-            #   --hostname gitlab.local.com \
-            #   --env GITLAB_OMNIBUS_CONFIG="external_url 'http://gitlab.local.com'" \
-            #   --publish 443:443 --publish 80:80 --publish 22:22 \
-            #   --name gitlab \
-            #   --restart always \
-            #   --volume $GITLAB_HOME/config:/etc/gitlab:Z \
-            #   --volume $GITLAB_HOME/logs:/var/log/gitlab:Z \
-            #   --volume $GITLAB_HOME/data:/var/opt/gitlab:Z \
-            #   --shm-size 256m \
-            #   gitlab/gitlab-ee:latest
+            ensure_docker_network
+            echo "Starting gitlab service..."
+            run_compose up -d gitlab
         ;;
         gitlab-runner)
-            echo '🔄 Starting gitlab-runner service...'
-            sudo docker-compose up -d gitlab-runner
+            ensure_docker_network
+            echo "Starting gitlab-runner service..."
+            run_compose up -d gitlab-runner
         ;;
         firebird)
-            echo '🔄 Starting Firebird service...'
-            sudo docker-compose up -d firebird
+            initialize_firebird_home
+            ensure_docker_network
+            echo "Starting Firebird service..."
+            run_compose up -d firebird
         ;;
         mssql)
-            echo '🔄 Starting MS SQL Server service...'
-            # Also run the one-shot post-start config (max server memory) to avoid OOM/TCP disconnects during heavy imports.
-            sudo docker-compose up -d mssql mssql-config
+            ensure_docker_network
+            echo "Starting MS SQL Server service..."
+            run_compose up -d mssql mssql-config
         ;;
         postgres)
-            echo '🔄 Starting PostgreSQL service...'
-            sudo docker-compose up -d postgres
+            ensure_docker_network
+            echo "Starting PostgreSQL service..."
+            run_compose up -d postgres
         ;;
         *)
-            # Handle unrecognized services
-            echo "❌ Error: Unknown service '$service'"
+            echo "Error: unknown service '$service'"
         ;;
     esac
 done

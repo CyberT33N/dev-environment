@@ -19,9 +19,14 @@ Linux:
 docker network create localdev
 ```
 
+Hint: `start.sh` creates the `localdev` network automatically when it is missing.
+
 ## Start services
 
 Linux (using start.sh):
+- Hinweis: `start.sh` legt den Firebird-Ordner automatisch an und setzt `FIREBIRD_HOME` fuer den Compose-Aufruf.
+- Fuer Firebird fuellt der One-shot-Service `firebird-init` beim ersten Start das benoetigte `etc`-Skeleton ein.
+- Die Runtime-Dateien wie `system/security2.fdb` und `data/testdb.fdb` werden danach vom Firebird-Container selbst erstellt.
 - To start all services:
   ```bash
   sudo bash ./start.sh

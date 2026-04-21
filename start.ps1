@@ -1,11 +1,11 @@
 # ==================== DOCKER SERVICE MANAGER ====================
-# PowerShell-Skript zum Verwalten von Docker-Containern aus docker-compose.yml
+# PowerShell script to manage Docker containers from docker-compose.yml
 # Beispiele zur Verwendung:
 
-# 🔄 Alle Services starten: 
+# Start all services:
 #   .\start.ps1
 
-# 🔄 Spezifische Services starten (z.B. mongo, gitlab, gitlab-runner, firebird, mssql, postgres): 
+# Start specific services (e.g. mongo, gitlab, gitlab-runner, firebird, mssql, postgres):
 #   .\start.ps1 -services "mongo"
 #   .\start.ps1 -services "gitlab"
 #   .\start.ps1 -services "gitlab-runner"
@@ -18,45 +18,88 @@ param(
     [string]$services = ""
 )
 
+function Get-FirebirdHome {
+    $configuredPath = [Environment]::GetEnvironmentVariable("FIREBIRD_HOME")
+    if (-not [string]::IsNullOrWhiteSpace($configuredPath)) {
+        return $configuredPath
+    }
+
+    return (Join-Path $env:USERPROFILE "data\firebird")
+}
+
+function Initialize-FirebirdHome {
+    $firebirdHome = Get-FirebirdHome
+    $dataPath = Join-Path $firebirdHome "data"
+    $systemPath = Join-Path $firebirdHome "system"
+    $etcPath = Join-Path $firebirdHome "etc"
+
+    foreach ($path in @($firebirdHome, $dataPath, $systemPath, $etcPath)) {
+        if (-not (Test-Path $path)) {
+            New-Item -ItemType Directory -Path $path -Force | Out-Null
+        }
+    }
+
+    $env:FIREBIRD_HOME = $firebirdHome
+    return $firebirdHome
+}
+
+function Ensure-DockerNetwork {
+    $networkName = "localdev"
+    $existingNetwork = docker network ls --format "{{.Name}}" | Where-Object { $_ -eq $networkName }
+    if (-not $existingNetwork) {
+        docker network create $networkName | Out-Null
+        Write-Host "Created Docker network '$networkName'." -ForegroundColor Yellow
+    }
+}
+
 # ==================== SERVICE START LOGIC ====================
-# Wenn keine Services angegeben wurden, starte alle
+# If no services were provided, start all.
 if ([string]::IsNullOrEmpty($services)) {
-    Write-Host "🔄 Starte alle Services mit docker-compose..." -ForegroundColor Cyan
+    Initialize-FirebirdHome | Out-Null
+    Ensure-DockerNetwork
+    Write-Host "Starting all services with docker-compose..." -ForegroundColor Cyan
     docker-compose up -d
     exit 0
 }
 
-# Verarbeite die angegebenen Services
+# Process the selected services.
 $servicesArray = $services -split ','
 foreach ($service in $servicesArray) {
     switch ($service.Trim()) {
         "mongo" {
-            Write-Host "🔄 Starte MongoDB Service..." -ForegroundColor Cyan
+            Ensure-DockerNetwork
+            Write-Host "Starting MongoDB service..." -ForegroundColor Cyan
             docker-compose up -d mongo
         }
         "gitlab" {
-            Write-Host "🔄 Starte GitLab Service..." -ForegroundColor Cyan
+            Ensure-DockerNetwork
+            Write-Host "Starting GitLab service..." -ForegroundColor Cyan
             docker-compose up -d gitlab
         }
         "gitlab-runner" {
-            Write-Host "🔄 Starte GitLab Runner Service..." -ForegroundColor Cyan
+            Ensure-DockerNetwork
+            Write-Host "Starting GitLab Runner service..." -ForegroundColor Cyan
             docker-compose up -d gitlab-runner
         }
         "firebird" {
-            Write-Host "🔄 Starte Firebird Service..." -ForegroundColor Cyan
+            Initialize-FirebirdHome | Out-Null
+            Ensure-DockerNetwork
+            Write-Host "Starting Firebird service..." -ForegroundColor Cyan
             docker-compose up -d firebird
         }
         "mssql" {
-            Write-Host "🔄 Starte MS SQL Server Service..." -ForegroundColor Cyan
+            Ensure-DockerNetwork
+            Write-Host "Starting MS SQL Server service..." -ForegroundColor Cyan
             # Also run the one-shot post-start config (max server memory) to avoid OOM/TCP disconnects during heavy imports.
             docker-compose up -d mssql mssql-config
         }
         "postgres" {
-            Write-Host "🔄 Starte PostgreSQL Service..." -ForegroundColor Cyan
+            Ensure-DockerNetwork
+            Write-Host "Starting PostgreSQL service..." -ForegroundColor Cyan
             docker-compose up -d postgres
         }
         default {
-            Write-Host "❌ Fehler: Unbekannter Service '$service'" -ForegroundColor Red
+            Write-Host "Error: unknown service '$service'" -ForegroundColor Red
         }
     }
 }

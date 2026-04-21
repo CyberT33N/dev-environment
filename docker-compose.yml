@@ -81,7 +81,24 @@ services:
       file: services/postgres/service.yml
       service: postgres
 
+  # One-shot Firebird bootstrap for fresh checkouts.
+  # It seeds only the static etc skeleton into the host-mounted Firebird home.
+  firebird-init:
+    image: alpine:3.19
+    command:
+      - /bin/sh
+      - /bootstrap/init.sh
+    volumes:
+      - ./services/firebird/bootstrap:/bootstrap:ro
+      - ${FIREBIRD_HOME:-~/data/firebird}/data:/firebird/data
+      - ${FIREBIRD_HOME:-~/data/firebird}/system:/firebird/system
+      - ${FIREBIRD_HOME:-~/data/firebird}/etc:/firebird/etc
+    restart: "no"
+
   firebird:
+    depends_on:
+      firebird-init:
+        condition: service_completed_successfully
     extends:
       file: services/firebird/service.yml
       service: firebird
