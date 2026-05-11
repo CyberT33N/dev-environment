@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:latest
+    # Pinned to 17 because 18+ changed the data directory layout (mount must be
+    # /var/lib/postgresql, not /var/lib/postgresql/data). Bumping to 18 requires
+    # a pg_upgrade of existing POSTGRES_HOME data.
+    image: postgres:17
     environment:
       POSTGRES_USER: test
       POSTGRES_PASSWORD: test
