@@ -1,6 +1,6 @@
 # Firebird bootstrap assets
 
-This directory contains the versioned bootstrap input for a fresh Firebird checkout.
+This directory contains the versioned bootstrap input for a fresh Firebird 2.5.8 checkout.
 
 ## What belongs here
 
@@ -16,4 +16,4 @@ This directory contains the versioned bootstrap input for a fresh Firebird check
 
 ## Current policy
 
-The repository versions only the canonical `etc` skeleton. It does not currently version a Firebird restore artifact or sample database. A future restore flow should live under `services/firebird/bootstrap/restore/` instead of `tmp/`.
+The repository versions only the canonical `etc` skeleton for the default Firebird 2.5.8 runtime. It does not currently version a Firebird restore artifact or sample database. A future restore flow should live under `services/firebird/bootstrap/restore/` instead of `tmp/`.
