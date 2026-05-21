@@ -87,9 +87,11 @@ services:
     image: alpine:3.19
     command:
       - /bin/sh
-      - /bootstrap/init.sh
+      - -ec
+      - tr -d '\r' < /bootstrap/init.sh | /bin/sh
     volumes:
-      - ./services/firebird/bootstrap:/bootstrap:ro
+      - ./services/firebird/bootstrap/init.sh:/bootstrap/init.sh:ro
+      - ${FIREBIRD_BOOTSTRAP_ETC_DIR:-./services/firebird/bootstrap/etc}:/bootstrap/etc:ro
       - ${FIREBIRD_HOME:-~/data/firebird}/data:/firebird/data
       - ${FIREBIRD_HOME:-~/data/firebird}/system:/firebird/system
       - ${FIREBIRD_HOME:-~/data/firebird}/etc:/firebird/etc
@@ -100,7 +102,7 @@ services:
       firebird-init:
         condition: service_completed_successfully
     extends:
-      file: services/firebird/service.yml
+      file: ${FIREBIRD_SERVICE_FILE:-services/firebird/service.yml}
       service: firebird
 
   mssql:
