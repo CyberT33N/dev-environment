@@ -14,10 +14,11 @@
 #   sudo bash ./start.sh --services=mongo,gitlab
 #   sudo bash ./start.sh --services=firebird
 #   sudo bash ./start.sh --services=firebird --firebird-version=3
+#   sudo bash ./start.sh --services=firebird --firebird-version=5
 #   sudo bash ./start.sh --services=mssql
 #   sudo bash ./start.sh --services=postgres
 
-# Firebird defaults to 2.5.8. Use --firebird-version=3 to switch to Firebird 3.
+# Firebird defaults to 2.5.8. Use --firebird-version=3 or --firebird-version=5 to switch versions.
 
 DEFAULT_FIREBIRD_VERSION="2.5.8"
 ORIGINAL_FIREBIRD_HOME="${FIREBIRD_HOME:-}"
@@ -26,6 +27,7 @@ firebird_version="$DEFAULT_FIREBIRD_VERSION"
 resolve_firebird_base_home() {
     local configured_path="${ORIGINAL_FIREBIRD_HOME:-}"
     local trimmed_path
+    local parent_path
 
     if [ -z "$configured_path" ]; then
         printf '%s\n' "$HOME/data/firebird"
@@ -33,12 +35,16 @@ resolve_firebird_base_home() {
     fi
 
     trimmed_path="${configured_path%/}"
-    if [ "${trimmed_path##*/}" = "3" ] && [ -f "$trimmed_path/etc/databases.conf" ]; then
-        printf '%s\n' "${trimmed_path%/3}"
-        return
-    fi
+    while [ "${trimmed_path##*/}" = "3" ] || [ "${trimmed_path##*/}" = "5" ]; do
+        parent_path="${trimmed_path%/${trimmed_path##*/}}"
+        if [ -z "$parent_path" ] || [ "$parent_path" = "$trimmed_path" ]; then
+            break
+        fi
 
-    printf '%s\n' "$configured_path"
+        trimmed_path="$parent_path"
+    done
+
+    printf '%s\n' "$trimmed_path"
 }
 
 resolve_firebird_home() {
@@ -49,6 +55,9 @@ resolve_firebird_home() {
     case "$FIREBIRD_VERSION" in
         3)
             printf '%s\n' "$firebird_base_home/3"
+        ;;
+        5)
+            printf '%s\n' "$firebird_base_home/5"
         ;;
         *)
             printf '%s\n' "$firebird_base_home"
@@ -64,8 +73,11 @@ normalize_firebird_version() {
         3|3.0|v3|v3.0)
             printf '%s\n' "3"
         ;;
+        5|5.0|5.0.3|v5|v5.0|v5.0.3)
+            printf '%s\n' "5"
+        ;;
         *)
-            echo "Error: unsupported Firebird version '$1'. Supported versions: $DEFAULT_FIREBIRD_VERSION, 3" >&2
+            echo "Error: unsupported Firebird version '$1'. Supported versions: $DEFAULT_FIREBIRD_VERSION, 3, 5" >&2
             exit 1
         ;;
     esac
@@ -78,6 +90,10 @@ configure_firebird_runtime() {
         3)
             FIREBIRD_SERVICE_FILE="services/firebird/service-3.yml"
             FIREBIRD_BOOTSTRAP_ETC_DIR="./services/firebird/bootstrap-3/etc"
+        ;;
+        5)
+            FIREBIRD_SERVICE_FILE="services/firebird/service-5.yml"
+            FIREBIRD_BOOTSTRAP_ETC_DIR="./services/firebird/bootstrap-5/etc"
         ;;
         *)
             FIREBIRD_SERVICE_FILE="services/firebird/service.yml"

@@ -8,7 +8,11 @@ for source in /bootstrap/etc/*; do
     target="/firebird/etc/$name"
 
     if [ ! -e "$target" ]; then
-        cp -R "$source" "$target"
+        if [ -d "$source" ]; then
+            cp -R "$source" "$target"
+        else
+            cp "$source" "$target"
+        fi
     fi
 done
 

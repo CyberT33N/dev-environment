@@ -12,6 +12,7 @@
 #   .\start.ps1 -services "mongo,gitlab"
 #   .\start.ps1 -services "firebird"
 #   .\start.ps1 -services "firebird" -firebirdVersion "3"
+#   .\start.ps1 -services "firebird" -firebirdVersion "5"
 #   .\start.ps1 -services "mssql"
 #   .\start.ps1 -services "postgres"
 
@@ -30,8 +31,9 @@ function Resolve-FirebirdVersion {
     switch -Regex ($normalizedInput) {
         '^(default|2\.5|2\.5\.8|2\.5\.8-ss|v2\.5\.8|v2\.5\.8-ss)$' { return "2.5.8" }
         '^(3|3\.0|v3|v3\.0)$' { return "3" }
+        '^(5|5\.0|5\.0\.3|v5|v5\.0|v5\.0\.3)$' { return "5" }
         default {
-            throw "Unsupported Firebird version '$Version'. Supported versions: 2.5.8, 3"
+            throw "Unsupported Firebird version '$Version'. Supported versions: 2.5.8, 3, 5"
         }
     }
 }
@@ -48,14 +50,22 @@ function Resolve-FirebirdBaseHomeFromEnvironment {
     }
 
     $trimmedPath = $ConfiguredPath.TrimEnd('\', '/')
-    $pathLeaf = Split-Path $trimmedPath -Leaf
-    $v3ConfigMarker = Join-Path $trimmedPath "etc\databases.conf"
 
-    if ($pathLeaf -eq "3" -and (Test-Path $v3ConfigMarker)) {
-        return (Split-Path $trimmedPath -Parent)
+    while ($true) {
+        $pathLeaf = Split-Path $trimmedPath -Leaf
+        if ($pathLeaf -ne "3" -and $pathLeaf -ne "5") {
+            break
+        }
+
+        $parentPath = Split-Path $trimmedPath -Parent
+        if ([string]::IsNullOrWhiteSpace($parentPath) -or $parentPath -eq $trimmedPath) {
+            break
+        }
+
+        $trimmedPath = $parentPath
     }
 
-    return $ConfiguredPath
+    return $trimmedPath
 }
 
 function Get-FirebirdBaseHome {
@@ -64,8 +74,9 @@ function Get-FirebirdBaseHome {
 
 function Get-FirebirdHome {
     $basePath = Get-FirebirdBaseHome
-    if ($env:FIREBIRD_VERSION -eq "3") {
-        return (Join-Path $basePath "3")
+    switch ($env:FIREBIRD_VERSION) {
+        "3" { return (Join-Path $basePath "3") }
+        "5" { return (Join-Path $basePath "5") }
     }
 
     return $basePath
@@ -78,6 +89,10 @@ function Set-FirebirdRuntime {
         "3" {
             $env:FIREBIRD_SERVICE_FILE = "services/firebird/service-3.yml"
             $env:FIREBIRD_BOOTSTRAP_ETC_DIR = "./services/firebird/bootstrap-3/etc"
+        }
+        "5" {
+            $env:FIREBIRD_SERVICE_FILE = "services/firebird/service-5.yml"
+            $env:FIREBIRD_BOOTSTRAP_ETC_DIR = "./services/firebird/bootstrap-5/etc"
         }
         default {
             $env:FIREBIRD_SERVICE_FILE = "services/firebird/service.yml"

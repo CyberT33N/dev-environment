@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  firebird:
+    # https://hub.docker.com/r/firebirdsql/firebird
+    image: firebirdsql/firebird:5.0.3
+    environment:
+      - FIREBIRD_ROOT_PASSWORD=masterkey
+      - FIREBIRD_USER=test
+      - FIREBIRD_PASSWORD=test
+      - FIREBIRD_DATABASE=testdb.fdb
+      - FIREBIRD_DATABASE_DEFAULT_CHARSET=UTF8
+      - TZ=Europe/Berlin
+    ports:
+      - "6431:6431"
+      - "6421:6421"
+    volumes:
+      # - C:/EVIDENT:/firebird/evident
+      - ${FIREBIRD_HOME:-~/data/firebird}/data:/var/lib/firebird/data
+      - ${FIREBIRD_HOME:-~/data/firebird}/etc/firebird.conf:/opt/firebird/firebird.conf:ro
+      - ${FIREBIRD_HOME:-~/data/firebird}/etc/databases.conf:/opt/firebird/databases.conf:ro
+      - ${FIREBIRD_HOME:-~/data/firebird}/etc/plugins.conf:/opt/firebird/plugins.conf:ro
+      - ${FIREBIRD_HOME:-~/data/firebird}/etc/fbtrace.conf:/opt/firebird/fbtrace.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "bash -lc ':</dev/tcp/127.0.0.1/6431'"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
